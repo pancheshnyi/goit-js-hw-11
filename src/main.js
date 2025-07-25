@@ -16,7 +16,12 @@ form.addEventListener('submit', async event => {
   const query = input.value.trim();
 
   if (!query) {
-    iziToast.warning({ message: 'Please enter a search term!' });
+    iziToast.warning({
+      message: 'Please enter a search term!',
+      position: 'topRight',
+      color: 'red',
+      timeout: 5000,
+    });
     return;
   }
 
@@ -30,12 +35,20 @@ form.addEventListener('submit', async event => {
       iziToast.error({
         message:
           'Sorry, there are no images matching your search query. Please try again!',
+        position: 'topRight',
+        color: 'red',
+        timeout: 5000,
       });
     } else {
       createGallery(data.hits);
     }
   } catch (error) {
-    iziToast.error({ message: 'An error occurred while fetching images.' });
+    iziToast.error({
+      message: 'An error occurred while fetching images.',
+      position: 'topRight',
+      color: 'red',
+      timeout: 5000,
+    });
   } finally {
     hideLoader();
   }
