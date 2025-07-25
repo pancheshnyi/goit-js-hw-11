@@ -1,16 +1,42 @@
-import getImagesByQuery from './js/pixabay-api';
+import { getImagesByQuery } from './js/pixabay-api';
+import {
+  createGallery,
+  clearGallery,
+  showLoader,
+  hideLoader,
+} from './js/render-functions';
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
+
 const form = document.querySelector('.form');
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
-import { clearGallery, showLoader } from './js/render-functions';
+const input = form.elements['search-text'];
 
-form.addEventListener('submit', handleSubmit);
-
-function handleSubmit(event) {
+form.addEventListener('submit', async event => {
   event.preventDefault();
+  const query = input.value.trim();
+
+  if (!query) {
+    iziToast.warning({ message: 'Please enter a search term!' });
+    return;
+  }
+
   clearGallery();
   showLoader();
-  const [input] = event.target.elements;
-  getImagesByQuery(input.value);
-  form.reset();
-}
+
+  try {
+    const data = await getImagesByQuery(query);
+
+    if (data.hits.length === 0) {
+      iziToast.error({
+        message:
+          'Sorry, there are no images matching your search query. Please try again!',
+      });
+    } else {
+      createGallery(data.hits);
+    }
+  } catch (error) {
+    iziToast.error({ message: 'An error occurred while fetching images.' });
+  } finally {
+    hideLoader();
+  }
+});
